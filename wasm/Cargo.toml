@@ -1,0 +1,107 @@
+[package]
+name = "fingerprint-wasm"
+version = "1.0.0"
+edition = "2021"
+repository = "https://github.com/Steven-Qiang/fingerprint-wasm"
+authors = ["Steven-Qiang"]
+license = "MIT"
+
+[profile.release]
+panic = 'abort'
+codegen-units = 1
+opt-level = 'z'
+lto = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2.92"
+wasm-bindgen-futures = "0.4.64"
+js-sys = "0.3.91"
+hex = "0.4.3"
+hmac = "0.12.1"
+sha2 = "0.10.9"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.6.5"
+serde_json = "1.0"
+murmurhash3 = "0.0.5"
+base64 = "0.22.1"
+futures = "0.3"
+
+[dependencies.web-sys]
+version = "^0.3.90"
+features = [
+    "console",
+    "Document",
+    "Screen",
+    "Crypto",
+    "Location",
+    "Navigator",
+    "RequestInit",
+    "HtmlElement",
+    "EventTarget",
+    "Window",
+    "Request",
+    "Response",
+    "Headers",
+    "HtmlCanvasElement",
+    "CanvasRenderingContext2d",
+    "WebGlRenderingContext",
+    "WebGl2RenderingContext",
+    "AudioContext",
+    "OscillatorNode",
+    "AnalyserNode",
+    "AudioDestinationNode",
+    "XmlHttpRequest",
+    "HtmlSpanElement",
+    "RtcPeerConnection",
+    "RtcConfiguration",
+    "MediaQueryList",
+    "CssStyleDeclaration",
+    "OscillatorType",
+    "AudioParam",
+    "OfflineAudioContext",
+    "IdbFactory",
+    "IdbDatabase",
+    "IdbObjectStore",
+    "IdbTransaction",
+    "IdbRequest",
+    "Storage",
+    "PluginArray",
+    "MimeTypeArray",
+    "MediaDevices",
+    "MediaQueryListEvent",
+    "CssMediaRule",
+    "CssRuleList",
+    "StyleSheet",
+    "StyleSheetList",
+    "HtmlStyleElement",
+    "HtmlIFrameElement",
+    "HtmlHeadElement",
+    "HtmlLinkElement",
+    "HtmlMetaElement",
+    "HtmlScriptElement",
+    "HtmlBodyElement",
+    "HtmlDocument",
+    "HtmlDialogElement",
+    "DomException",
+    "ErrorEvent",
+    "Event",
+    "KeyboardEvent",
+    "MouseEvent",
+    "TouchEvent",
+    "WheelEvent",
+    "AnimationEvent",
+    "TransitionEvent",
+    "ClipboardEvent",
+    "DragEvent",
+    "FocusEvent",
+    "InputEvent",
+    "PageTransitionEvent",
+    "PopStateEvent",
+    "StorageEvent",
+    "SubmitEvent",
+    "PointerEvent",
+    "CustomEvent",
+]

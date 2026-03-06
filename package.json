@@ -1,0 +1,45 @@
+{
+  "name": "fingerprint-wasm",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A browser fingerprinting library written in Rust and compiled to WebAssembly",
+  "main": "./dist/fingerprint_wasm.js",
+  "types": "./dist/fingerprint_wasm.d.ts",
+  "files": [
+    "dist/fingerprint_wasm_bg.wasm",
+    "dist/fingerprint_wasm.js",
+    "dist/fingerprint_wasm.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "fingerprint",
+    "browser",
+    "fingerprinting",
+    "wasm",
+    "webassembly",
+    "rust",
+    "visitor-identifier",
+    "browser-fingerprint"
+  ],
+  "author": "Steven-Qiang",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Steven-Qiang/fingerprint-wasm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Steven-Qiang/fingerprint-wasm/issues"
+  },
+  "homepage": "https://github.com/Steven-Qiang/fingerprint-wasm#readme",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "build:wasm": "cd wasm && wasm-pack build --target web --out-dir ../dist",
+    "build:wasm:optimized": "cd wasm && wasm-pack build --target web --out-dir ../dist --release && wasm-opt -O3 ../dist/fingerprint_wasm_bg.wasm -o ../dist/fingerprint_wasm_bg.wasm"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.30.3"
+}

@@ -1,0 +1,18 @@
+# Source files
+wasm/src/
+playground/
+.github/
+
+# Config files
+*.config.*
+tsconfig*.json
+.eslintrc*
+.prettierrc*
+
+# Development
+.gitignore
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
+# Build artifacts
+*.log
