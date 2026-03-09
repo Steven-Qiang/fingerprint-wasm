@@ -9,7 +9,7 @@ use crate::utils::browser::{is_gecko, is_gecko_143_or_newer};
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/hardwareConcurrency
  */
-pub fn get_hardware_concurrency() -> Result<JsValue, JsValue> {
+pub fn get_hardware_concurrency(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let value = get_unstable_hardware_concurrency();
 
     if let Some(v) = value {

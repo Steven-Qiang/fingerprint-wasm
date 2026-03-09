@@ -1,6 +1,6 @@
 {
   "name": "fingerprint-wasm",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "A browser fingerprinting library written in Rust and compiled to WebAssembly",
   "main": "./dist/fingerprint_wasm.js",

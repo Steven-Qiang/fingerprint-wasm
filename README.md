@@ -61,12 +61,12 @@ yarn add fingerprint-wasm
 
 ```html
 <script type="module">
-  import init, { get_fingerprint } from 'https://unpkg.com/fingerprint-wasm/dist/fingerprint_wasm.js';
+  import init, { getFingerprint } from 'https://unpkg.com/fingerprint-wasm/dist/fingerprint_wasm.js';
   
   async function main() {
     await init();
-    const result = await get_fingerprint();
-    console.log('Visitor ID:', result.visitor_id);
+    const result = await getFingerprint();
+    console.log('Visitor ID:', result.visitorId);
   }
   
   main();
@@ -78,20 +78,20 @@ yarn add fingerprint-wasm
 ### Basic Usage
 
 ```javascript
-import init, { get_fingerprint } from 'fingerprint-wasm';
+import init, { getFingerprint } from 'fingerprint-wasm';
 
 async function getVisitorId() {
   // Initialize the WASM module
   await init();
   
   // Get the fingerprint
-  const result = await get_fingerprint();
+  const result = await getFingerprint();
   
-  console.log('Visitor ID:', result.visitor_id);
+  console.log('Visitor ID:', result.visitorId);
   console.log('Confidence:', result.confidence);
-  console.log('Components:', result.components_json);
+  console.log('Components:', result.componentsJson);
   
-  return result.visitor_id;
+  return result.visitorId;
 }
 
 getVisitorId();
@@ -102,22 +102,27 @@ getVisitorId();
 ```vue
 <script setup>
 import { ref, onMounted } from 'vue';
-import init, { get_fingerprint } from 'fingerprint-wasm';
+import init, { getFingerprint } from 'fingerprint-wasm';
 
 const visitorId = ref('');
 const isLoading = ref(true);
+const confidence = ref(null);
 
 onMounted(async () => {
   await init();
-  const result = await get_fingerprint();
-  visitorId.value = result.visitor_id;
+  const result = await getFingerprint();
+  visitorId.value = result.visitorId;
+  confidence.value = result.confidence;
   isLoading.value = false;
 });
 </script>
 
 <template>
   <div v-if="isLoading">Loading...</div>
-  <div v-else>Visitor ID: {{ visitorId }}</div>
+  <div v-else>
+    <p>Visitor ID: {{ visitorId }}</p>
+    <p>Confidence: {{ confidence?.score }}</p>
+  </div>
 </template>
 ```
 
@@ -125,38 +130,71 @@ onMounted(async () => {
 
 ```jsx
 import { useEffect, useState } from 'react';
-import init, { get_fingerprint } from 'fingerprint-wasm';
+import init, { getFingerprint } from 'fingerprint-wasm';
 
 function App() {
   const [visitorId, setVisitorId] = useState('');
+  const [confidence, setConfidence] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadFingerprint() {
       await init();
-      const result = await get_fingerprint();
-      setVisitorId(result.visitor_id);
+      const result = await getFingerprint();
+      setVisitorId(result.visitorId);
+      setConfidence(result.confidence);
       setIsLoading(false);
     }
     loadFingerprint();
   }, []);
 
   if (isLoading) return <div>Loading...</div>;
-  return <div>Visitor ID: {visitorId}</div>;
+  return (
+    <div>
+      <p>Visitor ID: {visitorId}</p>
+      <p>Confidence: {confidence?.score}</p>
+    </div>
+  );
 }
+
+export default App;
 ```
 
 ## API Reference
 
-### `get_fingerprint(): Promise<AgentResult>`
+### `init()`
 
-Returns a promise that resolves to an `AgentResult` object containing:
+Initializes the WebAssembly module. Must be called before using `getFingerprint()`.
+
+```javascript
+import init from 'fingerprint-wasm';
+
+await init();
+```
+
+### `getFingerprint(options?: FingerprintOptions): Promise<FingerprintResult>`
+
+Returns a promise that resolves to a `FingerprintResult` object containing the visitor identifier and related data.
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `options` | `FingerprintOptions` | No | Optional configuration for fingerprinting |
+
+#### FingerprintOptions
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `visitor_id` | `string` | The unique visitor identifier (128-bit hash) |
+| `debug` | `boolean` | Enable debug mode for detailed logging |
+
+#### Returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `visitorId` | `string` | The unique visitor identifier |
 | `confidence` | `ConfidenceResult` | Confidence score and comment |
-| `components_json` | `string` | JSON string of all entropy components |
+| `componentsJson` | `string` | JSON string of all entropy components |
 | `version` | `string` | Library version |
 
 ### `ConfidenceResult`
@@ -164,7 +202,7 @@ Returns a promise that resolves to an `AgentResult` object containing:
 | Property | Type | Description |
 |----------|------|-------------|
 | `score` | `number` | Confidence score (0-1) |
-| `comment` | `string \| null` | Optional comment about the confidence |
+| `comment` | `string \| undefined` | Optional comment about the confidence |
 
 ## Entropy Sources
 
@@ -238,6 +276,28 @@ pnpm build:wasm
 
 # For optimized production build
 pnpm build:wasm:optimized
+
+# Run tests
+pnpm test
+```
+
+## Testing
+
+The project includes comprehensive Playwright tests for browser compatibility:
+
+```bash
+# Run all tests
+cd tests
+pnpm test
+
+# Run tests for specific browser
+pnpm test -- --project="Desktop Chrome"
+pnpm test -- --project="Desktop Firefox"
+pnpm test -- --project="Desktop Safari"
+
+# Run tests for mobile devices
+pnpm test -- --project="iPhone 14"
+pnpm test -- --project="Pixel 7"
 ```
 
 ## Project Structure
@@ -253,6 +313,7 @@ fingerprint-wasm/
 │   │   └── lib.rs          # WASM bindings
 │   └── Cargo.toml
 ├── playground/             # Vue.js demo application
+├── tests/                  # Playwright browser compatibility tests
 ├── dist/                   # Compiled WASM output
 └── package.json
 ```
@@ -273,14 +334,19 @@ While WASM provides better code protection than JavaScript, no client-side solut
 
 The library supports all modern browsers with WebAssembly support:
 
-- Chrome 57+
-- Firefox 52+
-- Safari 11+
-- Edge 16+
+| Browser | Minimum Version |
+|---------|----------------|
+| Chrome | 57+ |
+| Firefox | 52+ |
+| Safari | 11+ |
+| Edge | 16+ |
+| Opera | 44+ |
+| iOS Safari | 11+ |
+| Chrome Android | 57+ |
 
 ## Contributing
 
-See the [Contributing Guide](CONTRIBUTING.md) to learn how to contribute to the project.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
@@ -294,3 +360,4 @@ This project is a Rust + WebAssembly port of [FingerprintJS](https://github.com/
 
 - [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs) - Original JavaScript library
 - [Fingerprint Pro](https://fingerprint.com) - Commercial version with higher accuracy and server-side processing
+

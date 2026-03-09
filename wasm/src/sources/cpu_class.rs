@@ -1,6 +1,6 @@
 use wasm_bindgen::JsValue;
 
-pub fn get_cpu_class() -> Result<JsValue, JsValue> {
+pub fn get_cpu_class(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
 

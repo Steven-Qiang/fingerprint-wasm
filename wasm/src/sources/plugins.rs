@@ -5,7 +5,7 @@ use wasm_bindgen::JsValue;
  * It's a non-standard feature that is not supported in all browsers.
  * The order of plugins is not guaranteed and can vary between browsers.
  */
-pub fn get_plugins() -> Result<JsValue, JsValue> {
+pub fn get_plugins(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
 

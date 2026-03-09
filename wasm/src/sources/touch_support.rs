@@ -4,7 +4,7 @@ use wasm_bindgen::{JsCast, JsValue};
  * Touch support detection.
  * Returns an object with maxTouchPoints, touchEvent, and touchStart properties.
  */
-pub fn get_touch_support() -> Result<JsValue, JsValue> {
+pub fn get_touch_support(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
     let document = window.document().unwrap();

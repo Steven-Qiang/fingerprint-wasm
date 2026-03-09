@@ -7,7 +7,7 @@ use crate::utils::browser::{is_desktop_webkit, is_ipad, is_webkit};
  * In iOS 13+, Safari on iPad in desktop mode returns "MacIntel" instead of "iPad".
  * This function detects such cases and returns the correct platform.
  */
-pub fn get_platform() -> Result<JsValue, JsValue> {
+pub fn get_platform(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
     let platform = navigator.platform().unwrap_or_else(|_| "".to_string());

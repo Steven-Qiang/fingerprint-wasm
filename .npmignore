@@ -1,6 +1,7 @@
 # Source files
 wasm/src/
 playground/
+tests/
 .github/
 
 # Config files

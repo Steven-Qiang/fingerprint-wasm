@@ -16,7 +16,9 @@ enum SpecialFingerprint {
  * The signal emits warning in Chrome and Firefox, therefore it is enabled on Safari where it
  * doesn't produce warning and on Android where it's less visible
  */
-pub async fn get_audio_context_base_latency() -> Result<JsValue, JsValue> {
+pub async fn get_audio_context_base_latency(
+    _ctx: crate::sources::SourceContext,
+) -> Result<JsValue, JsValue> {
     let result = inner_get_audio_context_base_latency();
     Ok(JsValue::from(result))
 }

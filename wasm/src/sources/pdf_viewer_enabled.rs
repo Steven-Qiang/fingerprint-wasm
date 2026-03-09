@@ -1,7 +1,7 @@
 use wasm_bindgen::JsValue;
 
 // Returns whether the PDF viewer is enabled
-pub fn is_pdf_viewer_enabled() -> Result<JsValue, JsValue> {
+pub fn is_pdf_viewer_enabled(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     match inner_is_pdf_viewer_enabled() {
         Some(value) => Ok(JsValue::from(value)),
         None => Ok(JsValue::undefined()),

@@ -6,7 +6,7 @@ use wasm_bindgen::JsValue;
  * fingerprinting. The window resolution is always the document size in private mode of Safari
  * 17, so the window resolution is not used in Safari 17.
  */
-pub fn get_screen_resolution() -> Result<JsValue, JsValue> {
+pub fn get_screen_resolution(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     if is_webkit() && is_webkit_616_or_newer() && is_safari_webkit() {
         return Ok(JsValue::undefined());
     }

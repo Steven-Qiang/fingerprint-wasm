@@ -4,7 +4,7 @@ use wasm_bindgen::JsValue;
  * https://bugzilla.mozilla.org/show_bug.cgi?id=781447
  * localStorage is disabled in private mode in some browsers.
  */
-pub fn get_local_storage() -> Result<JsValue, JsValue> {
+pub fn get_local_storage(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     // try..catch because some in situations `window.localStorage` is exposed but throws a

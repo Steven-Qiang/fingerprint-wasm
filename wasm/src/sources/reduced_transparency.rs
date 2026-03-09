@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-transparency
  */
-pub fn is_transparency_reduced() -> Result<JsValue, JsValue> {
+pub fn is_transparency_reduced(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     if does_match(&window, "reduce")? {

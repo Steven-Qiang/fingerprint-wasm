@@ -1,4 +1,4 @@
-import init, { get_fingerprint } from '../../..';
+import init from '../../..';
 
 export async function initWasm(): Promise<void> {
   try {
@@ -8,5 +8,3 @@ export async function initWasm(): Promise<void> {
     throw error;
   }
 }
-
-export const getFingerprint = get_fingerprint;

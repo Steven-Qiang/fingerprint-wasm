@@ -69,7 +69,7 @@ const FONT_LIST: &[&str] = &[
 ];
 
 // kudos to http://www.lalit.org/lab/javascript-css-font-detect/
-pub async fn get_fonts() -> Result<JsValue, JsValue> {
+pub async fn get_fonts(_ctx: crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     // Running the script in an iframe makes it not affect the page look and not be affected by the
     // page CSS. See: https://github.com/fingerprintjs/fingerprintjs/issues/592
     // https://github.com/fingerprintjs/fingerprintjs/issues/628

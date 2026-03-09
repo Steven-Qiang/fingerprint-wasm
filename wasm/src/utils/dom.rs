@@ -1,6 +1,6 @@
-use wasm_bindgen::{JsCast, JsValue, closure::Closure};
+use wasm_bindgen::{closure::Closure, JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{HtmlIFrameElement, window};
+use web_sys::{window, HtmlIFrameElement};
 
 fn parse_simple_css_selector(
     selector: &str,
@@ -103,11 +103,35 @@ fn parse_simple_css_selector(
 }
 
 pub fn selector_to_element(selector: &str) -> web_sys::Element {
-    let document = window().unwrap().document().unwrap();
+    // Safely get document
+    let document = match web_sys::window() {
+        Some(window) => match window.document() {
+            Some(doc) => doc,
+            None => {
+                // If document cannot be obtained, return an empty div element
+                let window = web_sys::window().unwrap();
+                let doc = window.document().unwrap();
+                return doc.create_element("div").unwrap();
+            }
+        },
+        None => {
+            // If window cannot be obtained, return an empty div element
+            let window = web_sys::window().unwrap();
+            let doc = window.document().unwrap();
+            return doc.create_element("div").unwrap();
+        }
+    };
+
     let (tag, attributes) = parse_simple_css_selector(selector);
 
     let tag_name = tag.unwrap_or("div");
-    let element = document.create_element(tag_name).unwrap();
+    let element = match document.create_element(tag_name) {
+        Ok(elem) => elem,
+        Err(_) => {
+            // Fallback: create a div element
+            document.create_element("div").unwrap()
+        }
+    };
 
     for (name, values) in attributes {
         let value = values.join(" ");

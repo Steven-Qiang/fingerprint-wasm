@@ -12,7 +12,7 @@ const DEFAULT_TEXT: &str = "mmMwWLliI0fiflO&1";
  * The widths are measured in an iframe to avoid affecting the page layout.
  * The result is an object where keys are font preset names and values are widths.
  */
-pub async fn get_font_preferences() -> Result<JsValue, JsValue> {
+pub async fn get_font_preferences(_ctx: crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let sizes = with_iframe(|_iframe, i_window| {
         let document = match i_window.document() {
             Some(doc) => doc,

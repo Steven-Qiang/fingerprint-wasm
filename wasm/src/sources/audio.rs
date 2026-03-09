@@ -2,7 +2,7 @@ use crate::utils::browser::{
     is_chromium, is_chromium_122_or_newer, is_desktop_webkit, is_safari_webkit,
     is_samsung_internet, is_webkit, is_webkit_606_or_newer, is_webkit_616_or_newer,
 };
-use wasm_bindgen::{JsCast, JsValue, closure::Closure};
+use wasm_bindgen::{closure::Closure, JsCast, JsValue};
 
 const SPECIAL_FINGERPRINT_KNOWN_FOR_SUSPENDING: f64 = -1.0;
 const SPECIAL_FINGERPRINT_NOT_SUPPORTED: f64 = -2.0;
@@ -17,7 +17,9 @@ const SPECIAL_FINGERPRINT_KNOWN_FOR_ANTIFINGERPRINTING: f64 = -4.0;
  * fingerprinting. Audio signal is noised in private mode of Safari 17, so audio fingerprinting
  * is skipped in Safari 17.
  */
-pub async fn get_audio_fingerprint() -> Result<JsValue, JsValue> {
+pub async fn get_audio_fingerprint(
+    _ctx: crate::sources::SourceContext,
+) -> Result<JsValue, JsValue> {
     if does_browser_perform_antifingerprinting() {
         return Ok(JsValue::from_f64(
             SPECIAL_FINGERPRINT_KNOWN_FOR_ANTIFINGERPRINTING,

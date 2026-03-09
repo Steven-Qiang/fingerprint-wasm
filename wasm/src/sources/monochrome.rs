@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/monochrome
  */
-pub fn get_monochrome_depth() -> Result<JsValue, JsValue> {
+pub fn get_monochrome_depth(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     if !is_monochrome_supported() {
         return Ok(JsValue::undefined());
     }

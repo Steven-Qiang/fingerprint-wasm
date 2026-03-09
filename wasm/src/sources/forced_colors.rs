@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
  */
-pub fn are_colors_forced() -> Result<JsValue, JsValue> {
+pub fn are_colors_forced(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     if does_match(&window, "active")? {

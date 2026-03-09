@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://www.w3.org/TR/mediaqueries-5/#dynamic-range
  */
-pub fn is_hdr() -> Result<JsValue, JsValue> {
+pub fn is_hdr(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     if does_match(&window, "high")? {

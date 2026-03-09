@@ -13,7 +13,7 @@ const ROUNDING_PRECISION: f64 = 10.0;
  * fingerprinting. Screen frame is always zero in private mode of Safari 17 and Firefox 143+,
  * so screen frame is not used in Safari 17 and Firefox 143+.
  */
-pub async fn get_screen_frame() -> Result<JsValue, JsValue> {
+pub async fn get_screen_frame(_ctx: crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let is_safari_17_or_above = is_webkit() && is_webkit_616_or_newer() && is_safari_webkit();
     let is_firefox_143_or_above = is_gecko() && is_gecko_143_or_newer();
 
@@ -21,10 +21,11 @@ pub async fn get_screen_frame() -> Result<JsValue, JsValue> {
         return Ok(JsValue::undefined());
     }
 
-    let window = window().ok_or_else(|| JsValue::from_str("无法获取 window"))?;
+    let window =
+        window().ok_or_else(|| JsValue::from_str("get_screen_frame: cannot get window"))?;
     let screen = window
         .screen()
-        .or_else(|_| Err(JsValue::from_str("无法获取 screen")))?;
+        .or_else(|_| Err(JsValue::from_str("get_screen_frame: cannot get screen")))?;
 
     let frame_size = get_current_screen_frame(&screen);
 

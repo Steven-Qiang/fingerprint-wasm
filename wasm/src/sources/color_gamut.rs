@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/color-gamut
  */
-pub fn get_color_gamut() -> Result<JsValue, JsValue> {
+pub fn get_color_gamut(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     let gamuts = ["rec2020", "p3", "srgb"];

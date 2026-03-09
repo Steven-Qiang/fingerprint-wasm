@@ -6,7 +6,13 @@ use wasm_bindgen::JsValue;
  * the user's preferred languages. The language is represented using a BCP 47 language tag.
  * In Chrome 86+, the languages array is not available in incognito mode.
  */
-pub fn get_languages() -> Result<JsValue, JsValue> {
+pub fn get_languages(ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
+    if ctx.options.debug {
+        web_sys::console::log_1(&JsValue::from_str(
+            "[languages] Starting languages collection",
+        ));
+    }
+
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
 
@@ -35,6 +41,16 @@ pub fn get_languages() -> Result<JsValue, JsValue> {
             }
             result.push(&lang_array);
         }
+    }
+
+    if ctx.options.debug {
+        let result_str = js_sys::JSON::stringify(&result)
+            .and_then(|s| Ok(s.as_string().unwrap_or_default()))
+            .unwrap_or_default();
+        web_sys::console::log_1(&JsValue::from_str(&format!(
+            "[languages] Result: {}",
+            result_str
+        )));
     }
 
     Ok(JsValue::from(result))

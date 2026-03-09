@@ -37,7 +37,7 @@ const PRECISION_TYPES: &[&str] = &[
 const RENDERER_INFO_EXTENSION_NAME: &str = "WEBGL_debug_renderer_info";
 const POLYGON_MODE_EXTENSION_NAME: &str = "WEBGL_polygon_mode";
 
-pub fn get_web_gl_basics() -> Result<JsValue, JsValue> {
+pub fn get_web_gl_basics(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let gl = get_webgl_context();
 
     if gl.is_null() {
@@ -186,7 +186,7 @@ fn format_js_value(value: &JsValue) -> String {
     String::new()
 }
 
-pub fn get_web_gl_extensions() -> Result<JsValue, JsValue> {
+pub fn get_web_gl_extensions(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let gl = get_webgl_context();
 
     if gl.is_null() {

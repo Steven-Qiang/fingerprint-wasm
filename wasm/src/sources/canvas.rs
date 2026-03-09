@@ -1,12 +1,12 @@
 use js_sys::{Object, Reflect};
 use wasm_bindgen::{JsCast, JsValue};
-use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, window};
+use web_sys::{window, CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::utils::browser::{
     is_gecko, is_gecko_120_or_newer, is_safari_webkit, is_webkit, is_webkit_616_or_newer,
 };
 
-pub fn get_canvas_fingerprint() -> Result<JsValue, JsValue> {
+pub fn get_canvas_fingerprint(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let skip_images = does_browser_perform_anti_fingerprinting();
     let result = get_unstable_canvas_fingerprint(skip_images);
     Ok(JsValue::from(result))

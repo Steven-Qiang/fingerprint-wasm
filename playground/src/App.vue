@@ -72,20 +72,21 @@
 </template>
 
 <script setup lang="ts">
-import type { AgentResult } from '../..';
+import type { FingerprintResult } from '../..';
 import { computed, onMounted, ref } from 'vue';
-import { getFingerprint, initWasm } from './utils/wasmLoader';
+import { getFingerprint } from '../..';
+import { initWasm } from './utils/wasmLoader';
 
 const isLoading = ref(true);
 const hasError = ref(false);
 const errorMessage = ref('');
-const result = ref<AgentResult | null>(null);
+const result = ref<FingerprintResult | null>(null);
 const totalTime = ref(0);
 const userAgent = ref(navigator.userAgent);
 
-const visitorId = computed(() => result.value?.visitor_id || '');
+const visitorId = computed(() => result.value?.visitorId || '');
 const confidence = computed(() => result.value?.confidence || { score: 0 });
-const components = computed(() => result.value?.components_json || '{}');
+const components = computed(() => result.value?.componentsJson || '{}');
 
 function componentsToDebugString(components_json: string): string {
   try {
@@ -151,7 +152,7 @@ onMounted(async () => {
 
   try {
     await initWasm();
-    result.value = await getFingerprint();
+    result.value = await getFingerprint({ debug: true });
     console.log(result.value);
     totalTime.value = Date.now() - startTime;
   } catch (error) {

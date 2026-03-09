@@ -5,7 +5,7 @@ use wasm_bindgen::JsValue;
  * IE and Edge don't allow accessing indexedDB in private mode, therefore IE and Edge will have
  * different visitor identifier in normal and private modes.
  */
-pub fn get_indexed_db() -> Result<JsValue, JsValue> {
+pub fn get_indexed_db(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     if is_trident() || is_edge_html() {
         return Ok(JsValue::undefined());
     }

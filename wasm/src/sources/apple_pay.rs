@@ -1,5 +1,5 @@
 use crate::utils::dom::is_any_parent_cross_origin;
-use wasm_bindgen::{JsCast, JsValue, throw_val};
+use wasm_bindgen::{throw_val, JsCast, JsValue};
 
 // Apple Pay state enum
 enum ApplePayState {
@@ -13,7 +13,7 @@ enum ApplePayState {
 }
 
 // Returns the Apple Pay state
-pub async fn get_apple_pay_state() -> Result<JsValue, JsValue> {
+pub async fn get_apple_pay_state(_ctx: crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let result = inner_get_apple_pay_state();
     Ok(JsValue::from(result))
 }

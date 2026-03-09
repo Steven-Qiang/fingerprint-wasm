@@ -4,7 +4,7 @@ use wasm_bindgen::JsValue;
  * sessionStorage is similar to localStorage but the data is cleared when the page session ends.
  * https://bugzilla.mozilla.org/show_bug.cgi?id=781447
  */
-pub fn get_session_storage() -> Result<JsValue, JsValue> {
+pub fn get_session_storage(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     // try..catch because some in situations `window.sessionStorage` is exposed but throws a

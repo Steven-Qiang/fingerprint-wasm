@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [vue(), wasm()],
   base: process.env.GITHUB_PAGES ? '/fingerprint-wasm/' : '/',
   server: {
+    host: '0.0.0.0',
     fs: {
       allow: ['../'],
     },

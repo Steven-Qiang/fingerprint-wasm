@@ -7,7 +7,7 @@ use wasm_bindgen::JsValue;
  *
  * @see https://github.com/Modernizr/Modernizr/blob/master/feature-detects/cookies.js Taken from here
  */
-pub fn are_cookies_enabled() -> Result<JsValue, JsValue> {
+pub fn are_cookies_enabled(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
 

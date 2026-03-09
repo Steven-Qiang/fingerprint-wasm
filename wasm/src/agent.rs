@@ -1,9 +1,22 @@
-use js_sys::{JSON, Object};
+use js_sys::{Object, JSON};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
+use wasm_bindgen::{prelude::wasm_bindgen, JsCast, JsValue};
 
 use crate::{confidence::get_confidence, sources, utils::hashing};
+
+#[wasm_bindgen(typescript_custom_section)]
+const TS_APPEND_CONTENT: &'static str = r#"
+export interface FingerprintOptions {
+    debug?: boolean;
+}
+"#;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "FingerprintOptions")]
+    pub type FingerprintOptions;
+}
 
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Serialize, Deserialize, Clone)]
@@ -14,22 +27,42 @@ pub struct ConfidenceResult {
 
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Serialize, Deserialize, Clone)]
-pub struct AgentResult {
+pub struct FingerprintResult {
+    #[wasm_bindgen(js_name = "visitorId")]
     pub visitor_id: String,
     pub confidence: ConfidenceResult,
+    #[wasm_bindgen(js_name = "componentsJson")]
     pub components_json: String,
     pub version: String,
 }
 
-#[wasm_bindgen]
-pub async fn get_fingerprint() -> Result<AgentResult, JsValue> {
-    let get_components = sources::load_builtin_sources();
+#[wasm_bindgen(js_name = "getFingerprint")]
+pub async fn get_fingerprint(
+    options: Option<FingerprintOptions>,
+) -> Result<FingerprintResult, JsValue> {
+    let opts = parse_options(options)?;
+    let get_components = sources::load_builtin_sources(opts);
     let components = wasm_bindgen_futures::JsFuture::from(get_components).await?;
 
     make_agent_result(components)
 }
 
-fn make_agent_result(components: JsValue) -> Result<AgentResult, JsValue> {
+fn parse_options(options: Option<FingerprintOptions>) -> Result<sources::Options, JsValue> {
+    let mut opts = sources::Options::default();
+
+    if let Some(js_opts) = options {
+        let opts_value: JsValue = js_opts.into();
+        if let Ok(debug) = js_sys::Reflect::get(&opts_value, &JsValue::from_str("debug")) {
+            if let Some(debug_val) = debug.as_bool() {
+                opts.debug = debug_val;
+            }
+        }
+    }
+
+    Ok(opts)
+}
+
+fn make_agent_result(components: JsValue) -> Result<FingerprintResult, JsValue> {
     let confidence_js = get_confidence(components.clone())?;
     let confidence: ConfidenceResult = serde_wasm_bindgen::from_value(confidence_js)?;
 
@@ -41,7 +74,7 @@ fn make_agent_result(components: JsValue) -> Result<AgentResult, JsValue> {
         .as_string()
         .unwrap_or_else(|| "{}".to_string());
 
-    Ok(AgentResult {
+    Ok(FingerprintResult {
         visitor_id,
         confidence,
         components_json,

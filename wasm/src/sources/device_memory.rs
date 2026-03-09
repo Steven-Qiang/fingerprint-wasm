@@ -6,7 +6,7 @@ use wasm_bindgen::JsValue;
  * value in secret mode. So we return undefined in Samsung Internet to avoid fingerprinting.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/deviceMemory
  */
-pub fn get_device_memory() -> Result<JsValue, JsValue> {
+pub fn get_device_memory(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
 

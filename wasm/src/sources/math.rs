@@ -1,8 +1,7 @@
 use wasm_bindgen::JsValue;
 
-pub fn get_math_fingerprint() -> Result<JsValue, JsValue> {
+pub fn get_math_fingerprint(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let code = r#"
-(function() {
     var M = Math;
     var fallbackFn = function() { return 0; };
     
@@ -58,8 +57,8 @@ pub fn get_math_fingerprint() -> Result<JsValue, JsValue> {
         log1pPf: log1pPf(10),
         powPI: powPI(-100)
     };
-})()
-"#;
+    "#;
 
-    js_sys::eval(code)
+    let func = js_sys::Function::new_no_args(code);
+    func.call0(&JsValue::undefined())
 }

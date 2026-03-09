@@ -1,13 +1,13 @@
 use murmurhash3::murmurhash3_x64_128;
 
-// 获取 UTF-8 字节，与 JavaScript 版本一致
+// Get UTF-8 bytes, consistent with JavaScript version
 fn get_utf8_bytes(input: &str) -> Vec<u8> {
-    // 首先尝试快速路径：只包含 ASCII 字符
+    // First try fast path: only contains ASCII characters
     let mut result = Vec::with_capacity(input.len());
     for c in input.chars() {
         let char_code = c as u32;
         if char_code > 127 {
-            // 包含非 ASCII 字符，使用标准编码
+            // Contains non-ASCII characters, use standard encoding
             return input.as_bytes().to_vec();
         }
         result.push(char_code as u8);
@@ -15,15 +15,15 @@ fn get_utf8_bytes(input: &str) -> Vec<u8> {
     result
 }
 
-// 计算 MurmurHash3 x64 128 位哈希，与 JavaScript 版本一致
+// Calculate MurmurHash3 x64 128-bit hash, consistent with JavaScript version
 pub fn x64hash128(input: &str) -> String {
     let key = get_utf8_bytes(input);
     let seed: u64 = 0;
 
-    // 使用 murmurhash3 crate 计算哈希
+    // Use murmurhash3 crate to calculate hash
     let (h1, h2) = murmurhash3_x64_128(&key, seed);
 
-    // 与 JavaScript 版本相同的输出格式
+    // Same output format as JavaScript version
     format!(
         "{:08x}{:08x}{:08x}{:08x}",
         (h1 >> 32) as u32,

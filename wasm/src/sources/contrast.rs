@@ -8,7 +8,7 @@ const CONTRAST_PREFERENCE_FORCED_COLORS: i32 = 10;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast
  */
-pub fn get_contrast() -> Result<JsValue, JsValue> {
+pub fn get_contrast(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     if does_match(&window, "no-preference")? {

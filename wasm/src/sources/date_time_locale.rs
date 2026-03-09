@@ -9,7 +9,7 @@ enum Status {
 }
 
 // Returns the date time locale
-pub fn get_date_time_locale() -> Result<JsValue, JsValue> {
+pub fn get_date_time_locale(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let result = inner_get_date_time_locale();
     Ok(JsValue::from_str(&result))
 }

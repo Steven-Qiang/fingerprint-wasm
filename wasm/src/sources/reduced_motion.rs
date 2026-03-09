@@ -3,7 +3,7 @@ use wasm_bindgen::JsValue;
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
  */
-pub fn is_motion_reduced() -> Result<JsValue, JsValue> {
+pub fn is_motion_reduced(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     if does_match(&window, "reduce")? {

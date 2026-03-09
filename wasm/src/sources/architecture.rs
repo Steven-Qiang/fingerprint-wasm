@@ -5,7 +5,7 @@ use wasm_bindgen::JsValue;
 // have no NaN arguments, but produce NaN output, the output NaN has sign bit set.
 // We use it to distinguish x86/x86-64 from other architectures, by doing subtraction
 // of two infinities (must produce NaN per IEEE 754 standard).
-pub fn get_architecture() -> Result<JsValue, JsValue> {
+pub fn get_architecture(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let result = inner_get_architecture();
     Ok(JsValue::from(result))
 }

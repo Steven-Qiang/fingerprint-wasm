@@ -3,7 +3,9 @@ use wasm_bindgen::{JsCast, JsValue};
 // Checks whether the Safari's Privacy Preserving Ad Measurement setting is on.
 // The setting is on when the value is not undefined.
 // A.k.a. private click measurement, privacy-preserving ad attribution.
-pub fn get_private_click_measurement() -> Result<JsValue, JsValue> {
+pub fn get_private_click_measurement(
+    _ctx: &crate::sources::SourceContext,
+) -> Result<JsValue, JsValue> {
     match inner_get_private_click_measurement() {
         Some(value) => Ok(JsValue::from_str(&value)),
         None => Ok(JsValue::undefined()),

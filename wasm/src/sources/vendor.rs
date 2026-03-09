@@ -4,7 +4,7 @@ use wasm_bindgen::JsValue;
  * navigator.vendor returns the name of the browser vendor.
  * It's a non-standard property that is not supported in all browsers.
  */
-pub fn get_vendor() -> Result<JsValue, JsValue> {
+pub fn get_vendor(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let navigator = window.navigator();
 

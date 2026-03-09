@@ -4,7 +4,7 @@ use wasm_bindgen::JsValue;
  * openDatabase is a method that allows web pages to access Web SQL databases.
  * It's a non-standard feature that is supported only in some browsers.
  */
-pub fn get_open_database() -> Result<JsValue, JsValue> {
+pub fn get_open_database(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
 
     match js_sys::Reflect::get(&window, &JsValue::from_str("openDatabase")) {

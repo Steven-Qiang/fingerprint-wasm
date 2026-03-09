@@ -1,14 +1,26 @@
 use crate::utils::{
-    async_utils::wait,
     browser::{is_android, is_webkit},
     data::count_truthy,
     dom::selector_to_element,
 };
-use base64::{Engine as _, engine::general_purpose::STANDARD};
+use base64::{engine::general_purpose::STANDARD, Engine as _};
 use wasm_bindgen::{JsCast, JsValue};
+use wasm_bindgen_futures::JsFuture;
 type Filters = std::collections::HashMap<String, Vec<String>>;
 
-// cspell-checker: disable
+// WebKit-compatible wait function that doesn't use Closure
+async fn wait(milliseconds: u32) -> Result<(), JsValue> {
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        let window = web_sys::window().unwrap();
+        let _timeout_id = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+            &resolve,
+            milliseconds.try_into().unwrap(),
+        );
+        // No need to clear timeout as it will be called once
+    });
+    JsFuture::from(promise).await?;
+    Ok(())
+}
 
 /**
  * Only single element selector are supported (no operators like space, +, >, etc).
@@ -505,7 +517,7 @@ pub fn get_filters() -> Filters {
  * So empty array shouldn't be treated as "no blockers", it should be treated as "no signal".
  * If you are a website owner, don't make your visitors want to disable content blockers.
  */
-pub async fn get_dom_blockers() -> Result<JsValue, JsValue> {
+pub async fn get_dom_blockers(ctx: crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     if !is_applicable() {
         return Ok(JsValue::undefined());
     }
@@ -521,6 +533,10 @@ pub async fn get_dom_blockers() -> Result<JsValue, JsValue> {
     }
 
     let blocked_selectors = get_blocked_selectors(&all_selectors).await;
+
+    if ctx.options.debug {
+        print_debug(&filters, &blocked_selectors);
+    }
 
     let mut active_blockers = Vec::new();
     for filter_name in &filter_names {
@@ -547,6 +563,23 @@ pub async fn get_dom_blockers() -> Result<JsValue, JsValue> {
     Ok(JsValue::from(result))
 }
 
+fn print_debug(filters: &Filters, blocked_selectors: &std::collections::HashMap<String, bool>) {
+    let mut message = "DOM blockers debug:\n```".to_string();
+    for (filter_name, selectors) in filters {
+        message.push_str(&format!("\n{filter_name}:"));
+        for selector in selectors {
+            let status = if blocked_selectors.contains_key(selector) {
+                "🚫"
+            } else {
+                "➡️"
+            };
+            message.push_str(&format!("\n  {status} {selector}"));
+        }
+    }
+    message.push_str("\n```");
+    web_sys::console::log_1(&JsValue::from_str(&message));
+}
+
 pub fn is_applicable() -> bool {
     // Safari (desktop and mobile) and all Android browsers keep content blockers in both regular
     // and private mode
@@ -556,8 +589,19 @@ pub fn is_applicable() -> bool {
 pub async fn get_blocked_selectors(
     selectors: &[String],
 ) -> std::collections::HashMap<String, bool> {
-    let document = web_sys::window().unwrap().document().unwrap();
-    let root = document.create_element("div").unwrap();
+    let document = match web_sys::window() {
+        Some(window) => match window.document() {
+            Some(doc) => doc,
+            None => return std::collections::HashMap::new(),
+        },
+        None => return std::collections::HashMap::new(),
+    };
+
+    let root = match document.create_element("div") {
+        Ok(elem) => elem,
+        Err(_) => return std::collections::HashMap::new(),
+    };
+
     let mut elements = Vec::new();
     let mut blocked_selectors = std::collections::HashMap::new();
 
@@ -573,32 +617,44 @@ pub async fn get_blocked_selectors(
             }
         }
         // Protects from unwanted effects of `+` and `~` selectors of filters
-        let holder = document.create_element("div").unwrap();
-        force_show(&holder);
-        holder.append_child(&element).unwrap();
-        root.append_child(&holder).unwrap();
-        elements.push(element);
+        match document.create_element("div") {
+            Ok(holder) => {
+                force_show(&holder);
+                if holder.append_child(&element).is_ok() {
+                    if root.append_child(&holder).is_ok() {
+                        elements.push(element);
+                    }
+                }
+            }
+            Err(_) => continue,
+        }
     }
 
     // document.body can be null while the page is loading
     while document.body().is_none() {
-        let _ = wait(50).await;
-    }
-
-    document.body().unwrap().append_child(&root).unwrap();
-
-    // Then check which of the elements are blocked
-    for (i, selector) in selectors.iter().enumerate() {
-        let element = &elements[i];
-        if let Ok(html_element) = element.clone().dyn_into::<web_sys::HtmlElement>() {
-            if html_element.offset_parent().is_none() {
-                blocked_selectors.insert(selector.clone(), true);
-            }
+        if wait(50).await.is_err() {
+            return blocked_selectors;
         }
     }
 
-    // Then remove the elements
-    root.remove();
+    if let Some(body) = document.body() {
+        if body.append_child(&root).is_ok() {
+            // Then check which of the elements are blocked
+            for (i, selector) in selectors.iter().enumerate() {
+                if i < elements.len() {
+                    let element = &elements[i];
+                    if let Ok(html_element) = element.clone().dyn_into::<web_sys::HtmlElement>() {
+                        if html_element.offset_parent().is_none() {
+                            blocked_selectors.insert(selector.clone(), true);
+                        }
+                    }
+                }
+            }
+
+            // Then remove the elements
+            let _ = root.remove();
+        }
+    }
 
     blocked_selectors
 }

@@ -1,4 +1,15 @@
-use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use web_sys::console;
+
+#[derive(Default, Clone)]
+pub struct Options {
+    pub debug: bool,
+}
+
+#[derive(Clone)]
+pub struct SourceContext {
+    pub options: Options,
+}
 
 mod apple_pay;
 mod architecture;
@@ -54,216 +65,273 @@ enum SourceResult {
 
 struct SourceDefinition {
     name: &'static str,
-    source: fn() -> SourceResult,
+    source: fn(&SourceContext) -> SourceResult,
 }
 
 static SOURCES: &[SourceDefinition] = &[
     SourceDefinition {
         name: "fonts",
-        source: || SourceResult::Async(wasm_bindgen_futures::future_to_promise(fonts::get_fonts())),
+        source: |ctx| {
+            SourceResult::Async(wasm_bindgen_futures::future_to_promise(fonts::get_fonts(
+                ctx.clone(),
+            )))
+        },
     },
     SourceDefinition {
         name: "domBlockers",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                dom_blockers::get_dom_blockers(),
+                dom_blockers::get_dom_blockers(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "fontPreferences",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                font_preferences::get_font_preferences(),
+                font_preferences::get_font_preferences(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "audio",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                audio::get_audio_fingerprint(),
+                audio::get_audio_fingerprint(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "screenFrame",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                screen_frame::get_screen_frame(),
+                screen_frame::get_screen_frame(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "canvas",
-        source: || SourceResult::Sync(canvas::get_canvas_fingerprint()),
+        source: |ctx| SourceResult::Sync(canvas::get_canvas_fingerprint(ctx)),
     },
     SourceDefinition {
         name: "osCpu",
-        source: || SourceResult::Sync(os_cpu::get_os_cpu()),
+        source: |ctx| SourceResult::Sync(os_cpu::get_os_cpu(ctx)),
     },
     SourceDefinition {
         name: "languages",
-        source: || SourceResult::Sync(languages::get_languages()),
+        source: |ctx| SourceResult::Sync(languages::get_languages(ctx)),
     },
     SourceDefinition {
         name: "colorDepth",
-        source: || SourceResult::Sync(color_depth::get_color_depth()),
+        source: |ctx| SourceResult::Sync(color_depth::get_color_depth(ctx)),
     },
     SourceDefinition {
         name: "deviceMemory",
-        source: || SourceResult::Sync(device_memory::get_device_memory()),
+        source: |ctx| SourceResult::Sync(device_memory::get_device_memory(ctx)),
     },
     SourceDefinition {
         name: "screenResolution",
-        source: || SourceResult::Sync(screen_resolution::get_screen_resolution()),
+        source: |ctx| SourceResult::Sync(screen_resolution::get_screen_resolution(ctx)),
     },
     SourceDefinition {
         name: "hardwareConcurrency",
-        source: || SourceResult::Sync(hardware_concurrency::get_hardware_concurrency()),
+        source: |ctx| SourceResult::Sync(hardware_concurrency::get_hardware_concurrency(ctx)),
     },
     SourceDefinition {
         name: "timezone",
-        source: || SourceResult::Sync(timezone::get_timezone()),
+        source: |ctx| SourceResult::Sync(timezone::get_timezone(ctx)),
     },
     SourceDefinition {
         name: "sessionStorage",
-        source: || SourceResult::Sync(session_storage::get_session_storage()),
+        source: |ctx| SourceResult::Sync(session_storage::get_session_storage(ctx)),
     },
     SourceDefinition {
         name: "localStorage",
-        source: || SourceResult::Sync(local_storage::get_local_storage()),
+        source: |ctx| SourceResult::Sync(local_storage::get_local_storage(ctx)),
     },
     SourceDefinition {
         name: "indexedDB",
-        source: || SourceResult::Sync(indexed_db::get_indexed_db()),
+        source: |ctx| SourceResult::Sync(indexed_db::get_indexed_db(ctx)),
     },
     SourceDefinition {
         name: "openDatabase",
-        source: || SourceResult::Sync(open_database::get_open_database()),
+        source: |ctx| SourceResult::Sync(open_database::get_open_database(ctx)),
     },
     SourceDefinition {
         name: "cpuClass",
-        source: || SourceResult::Sync(cpu_class::get_cpu_class()),
+        source: |ctx| SourceResult::Sync(cpu_class::get_cpu_class(ctx)),
     },
     SourceDefinition {
         name: "platform",
-        source: || SourceResult::Sync(platform::get_platform()),
+        source: |ctx| SourceResult::Sync(platform::get_platform(ctx)),
     },
     SourceDefinition {
         name: "plugins",
-        source: || SourceResult::Sync(plugins::get_plugins()),
+        source: |ctx| SourceResult::Sync(plugins::get_plugins(ctx)),
     },
     SourceDefinition {
         name: "touchSupport",
-        source: || SourceResult::Sync(touch_support::get_touch_support()),
+        source: |ctx| SourceResult::Sync(touch_support::get_touch_support(ctx)),
     },
     SourceDefinition {
         name: "vendor",
-        source: || SourceResult::Sync(vendor::get_vendor()),
+        source: |ctx| SourceResult::Sync(vendor::get_vendor(ctx)),
     },
     SourceDefinition {
         name: "vendorFlavors",
-        source: || SourceResult::Sync(vendor_flavors::get_vendor_flavors()),
+        source: |ctx| SourceResult::Sync(vendor_flavors::get_vendor_flavors(ctx)),
     },
     SourceDefinition {
         name: "cookiesEnabled",
-        source: || SourceResult::Sync(cookies_enabled::are_cookies_enabled()),
+        source: |ctx| SourceResult::Sync(cookies_enabled::are_cookies_enabled(ctx)),
     },
     SourceDefinition {
         name: "colorGamut",
-        source: || SourceResult::Sync(color_gamut::get_color_gamut()),
+        source: |ctx| SourceResult::Sync(color_gamut::get_color_gamut(ctx)),
     },
     SourceDefinition {
         name: "invertedColors",
-        source: || SourceResult::Sync(inverted_colors::are_colors_inverted()),
+        source: |ctx| SourceResult::Sync(inverted_colors::are_colors_inverted(ctx)),
     },
     SourceDefinition {
         name: "forcedColors",
-        source: || SourceResult::Sync(forced_colors::are_colors_forced()),
+        source: |ctx| SourceResult::Sync(forced_colors::are_colors_forced(ctx)),
     },
     SourceDefinition {
         name: "monochrome",
-        source: || SourceResult::Sync(monochrome::get_monochrome_depth()),
+        source: |ctx| SourceResult::Sync(monochrome::get_monochrome_depth(ctx)),
     },
     SourceDefinition {
         name: "contrast",
-        source: || SourceResult::Sync(contrast::get_contrast()),
+        source: |ctx| SourceResult::Sync(contrast::get_contrast(ctx)),
     },
     SourceDefinition {
         name: "reducedMotion",
-        source: || SourceResult::Sync(reduced_motion::is_motion_reduced()),
+        source: |ctx| SourceResult::Sync(reduced_motion::is_motion_reduced(ctx)),
     },
     SourceDefinition {
         name: "reducedTransparency",
-        source: || SourceResult::Sync(reduced_transparency::is_transparency_reduced()),
+        source: |ctx| SourceResult::Sync(reduced_transparency::is_transparency_reduced(ctx)),
     },
     SourceDefinition {
         name: "hdr",
-        source: || SourceResult::Sync(hdr::is_hdr()),
+        source: |ctx| SourceResult::Sync(hdr::is_hdr(ctx)),
     },
     SourceDefinition {
         name: "math",
-        source: || SourceResult::Sync(math::get_math_fingerprint()),
+        source: |ctx| SourceResult::Sync(math::get_math_fingerprint(ctx)),
     },
     SourceDefinition {
         name: "pdfViewerEnabled",
-        source: || SourceResult::Sync(pdf_viewer_enabled::is_pdf_viewer_enabled()),
+        source: |ctx| SourceResult::Sync(pdf_viewer_enabled::is_pdf_viewer_enabled(ctx)),
     },
     SourceDefinition {
         name: "architecture",
-        source: || SourceResult::Sync(architecture::get_architecture()),
+        source: |ctx| SourceResult::Sync(architecture::get_architecture(ctx)),
     },
     SourceDefinition {
         name: "applePay",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                apple_pay::get_apple_pay_state(),
+                apple_pay::get_apple_pay_state(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "privateClickMeasurement",
-        source: || SourceResult::Sync(private_click_measurement::get_private_click_measurement()),
+        source: |ctx| {
+            SourceResult::Sync(private_click_measurement::get_private_click_measurement(
+                ctx,
+            ))
+        },
     },
     SourceDefinition {
         name: "audioBaseLatency",
-        source: || {
+        source: |ctx| {
             SourceResult::Async(wasm_bindgen_futures::future_to_promise(
-                audio_base_latency::get_audio_context_base_latency(),
+                audio_base_latency::get_audio_context_base_latency(ctx.clone()),
             ))
         },
     },
     SourceDefinition {
         name: "dateTimeLocale",
-        source: || SourceResult::Sync(date_time_locale::get_date_time_locale()),
+        source: |ctx| SourceResult::Sync(date_time_locale::get_date_time_locale(ctx)),
     },
     SourceDefinition {
         name: "webGlBasics",
-        source: || SourceResult::Sync(webgl::get_web_gl_basics()),
+        source: |ctx| SourceResult::Sync(webgl::get_web_gl_basics(ctx)),
     },
     SourceDefinition {
         name: "webGlExtensions",
-        source: || SourceResult::Sync(webgl::get_web_gl_extensions()),
+        source: |ctx| SourceResult::Sync(webgl::get_web_gl_extensions(ctx)),
     },
 ];
 
-pub fn load_builtin_sources() -> js_sys::Promise {
+pub fn load_builtin_sources(options: Options) -> js_sys::Promise {
     wasm_bindgen_futures::future_to_promise(async move {
-        let components = load_sources(SOURCES).await?;
+        let components = load_sources(SOURCES, options).await?;
         Ok(JsValue::from(components))
     })
 }
 
-async fn load_sources(sources: &[SourceDefinition]) -> Result<js_sys::Object, JsValue> {
-    let components = js_sys::Object::new();
+fn format_js_error(error: &JsValue) -> String {
+    match js_sys::JSON::stringify(error) {
+        Ok(s) => s.as_string().unwrap_or_else(|| format!("{:?}", error)),
+        Err(_) => format!("{:?}", error),
+    }
+}
 
-    for source_def in sources {
+async fn load_sources(
+    sources: &[SourceDefinition],
+    options: Options,
+) -> Result<js_sys::Object, JsValue> {
+    let components = js_sys::Object::new();
+    let total_start = unsafe { now() };
+    let context = SourceContext {
+        options: options.clone(),
+    };
+
+    for (index, source_def) in sources.iter().enumerate() {
         let load_start_time = unsafe { now() };
 
-        let result = match (source_def.source)() {
-            SourceResult::Sync(r) => r,
-            SourceResult::Async(promise) => wasm_bindgen_futures::JsFuture::from(promise).await,
+        if options.debug {
+            console::log_1(&JsValue::from_str(&format!(
+                "[Source {}/{}] Starting: {}",
+                index + 1,
+                sources.len(),
+                source_def.name
+            )));
+        }
+
+        let result = match (source_def.source)(&context) {
+            SourceResult::Sync(r) => {
+                if options.debug {
+                    console::log_1(&JsValue::from_str(&format!(
+                        "[Source {}] {} is SYNC, executing...",
+                        index + 1,
+                        source_def.name
+                    )));
+                }
+                r
+            }
+            SourceResult::Async(promise) => {
+                if options.debug {
+                    console::log_1(&JsValue::from_str(&format!(
+                        "[Source {}] {} is ASYNC, waiting...",
+                        index + 1,
+                        source_def.name
+                    )));
+                }
+                let result = wasm_bindgen_futures::JsFuture::from(promise).await;
+                if options.debug {
+                    console::log_1(&JsValue::from_str(&format!(
+                        "[Source {}] {} ASYNC completed",
+                        index + 1,
+                        source_def.name
+                    )));
+                }
+                result
+            }
         };
 
         let duration = unsafe { now() } - load_start_time;
@@ -274,9 +342,26 @@ async fn load_sources(sources: &[SourceDefinition]) -> Result<js_sys::Object, Js
                 if !value.is_null() {
                     js_sys::Reflect::set(&component, &JsValue::from_str("value"), &value).unwrap();
                 }
+                if options.debug {
+                    console::log_1(&JsValue::from_str(&format!(
+                        "[Source {}] {} SUCCESS ({:.2}ms)",
+                        index + 1,
+                        source_def.name,
+                        duration
+                    )));
+                }
             }
             Err(error) => {
                 js_sys::Reflect::set(&component, &JsValue::from_str("error"), &error).unwrap();
+                if options.debug {
+                    console::error_1(&JsValue::from_str(&format!(
+                        "[Source {}] {} ERROR ({:.2}ms): {}",
+                        index + 1,
+                        source_def.name,
+                        duration,
+                        format_js_error(&error)
+                    )));
+                }
             }
         }
         js_sys::Reflect::set(
@@ -289,5 +374,13 @@ async fn load_sources(sources: &[SourceDefinition]) -> Result<js_sys::Object, Js
         js_sys::Reflect::set(&components, &JsValue::from_str(source_def.name), &component).unwrap();
     }
 
+    let total_duration = unsafe { now() } - total_start;
+    if options.debug {
+        console::log_1(&JsValue::from_str(&format!(
+            "[Complete] All {} sources finished in {:.2}ms",
+            sources.len(),
+            total_duration
+        )));
+    }
     Ok(components)
 }

@@ -5,7 +5,7 @@ use wasm_bindgen::JsValue;
  * Returns an array of browser vendor-specific global objects that are present.
  * These objects are used to identify specific browser flavors and versions.
  */
-pub fn get_vendor_flavors() -> Result<JsValue, JsValue> {
+pub fn get_vendor_flavors(_ctx: &crate::sources::SourceContext) -> Result<JsValue, JsValue> {
     let window = web_sys::window().unwrap();
     let mut flavors = Vec::new();
 
